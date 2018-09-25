@@ -505,7 +505,7 @@ void main() {
 						ball_bounce_sound(); // play sound
 						ball_move_speedx = 0;
 					}
-					attack_type = rand() % 2;
+					attack_type = rand() % 3;
 					hits++;
 					
 
