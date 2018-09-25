@@ -197,14 +197,15 @@ const unsigned char MapData[] = {
 0x96,0x97,0x98,0x99,0x9A,0x9B,0x9C,0x9D,0x9E,0x9F,0xA0,0xA1,0xA2,0xA3,0xA4,0x00,0xA5,0xA6,0xA7,0xA8
 };
 
-#define Width			160
-#define Height 			144
-#define Centerx			Width / 2
-#define Centery 		Height / 2
-#define offset_y 		9
-#define offset_y_player 9
-#define score_offset_x  0
-#define winloseoffset   14
+#define Width				160
+#define Height 				144
+#define Centerx				Width / 2
+#define Centery 			Height / 2
+#define offset_y 			9
+#define offset_y_player 	9
+#define score_offset_x  	0
+#define winloseoffset   	14
+#define player_move_speed 	4
 
 // sound channel 2
 #define SND_LENGTH(N)             (N % 64)
@@ -290,6 +291,8 @@ void main() {
 	UINT8 enemy_score = 0;
 	UWORD seed = 0;
 	UINT8 paused = 0;
+	UINT8 attack_type = 0;
+	UINT8 hits = 0;
 	// init background
 	set_bkg_data(0,169, &TileData);
 	set_bkg_tiles(0,0,20,18,&MapData);
@@ -365,29 +368,55 @@ void main() {
 			paused = 1;
 			}
 
+		if(hits == 4) {
+			ball_move_speedy++;
+			hits = 0;
+		}
+
 		if (halt == 0) {
 			ballxy[0] += ball_move_speedx;
 			ballxy[1] += ball_move_speedy;
 				if (joypad() & J_LEFT) {
 					if (player_x > 8) {
-						player_x -= 3;
+						player_x -= player_move_speed;
 					}
 				
 			}
 			if (joypad() & J_RIGHT) {
 				if (player_x + 8 < Width) {
-					player_x += 3;
+					player_x += player_move_speed;
 					
 				}
 			}
 			
 		}
-		if (halt == 0) {			
-			if (enemy__x + 16 < ballxy[0] + 4) {
-				enemy__x += 1;
+		if (halt == 0) {
+			if (attack_type == 0) {
+				if (enemy__x + 16 < ballxy[0] + 4) {
+					enemy__x += 1;
+				}
+				if (enemy__x > ballxy[0] + 4) {
+					enemy__x -= 1;
+				}
 			}
-			if (enemy__x > ballxy[0] + 4) {
-				enemy__x -= 1;
+			else {
+				if (rand() % 2 == 0) {
+					if (enemy__x + 14 < ballxy[0] + 4) {
+						enemy__x += 1;
+					}
+					if (enemy__x + 2 > ballxy[0] + 4) {
+						enemy__x -= 1;
+					}
+				}
+				else
+				{
+					if (enemy__x + 10 < ballxy[0] + 4) {
+						enemy__x += 1;
+					}
+					if (enemy__x + 6 > ballxy[0] + 4) {
+						enemy__x -= 1;
+					}
+				}
 			}
 		}
 		else { // halt = 1
@@ -398,6 +427,8 @@ void main() {
 				enemy__x++;
 			}
 			if (pause4 == 0) {
+				hits = 0;
+				ball_move_speedy = 1;
 				halt = 0;	
 				ballxy[0] = Centerx;
 				ballxy[1] = Centery;
@@ -474,6 +505,8 @@ void main() {
 						ball_bounce_sound(); // play sound
 						ball_move_speedx = 0;
 					}
+					attack_type = rand() % 2;
+					hits++;
 					
 
 				}
@@ -516,7 +549,7 @@ void main() {
 						ball_bounce_sound(); // play sound
 						ball_move_speedx = 0;
 					}
-
+					hits++;
 
 
 				}
