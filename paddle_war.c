@@ -112,7 +112,6 @@ void main() {
 	NR51_REG = 0xFF; // enables channels
 
 	disable_interrupts();
-  	DISPLAY_OFF;
 
 	set_sprite_data(0,4, sprite_data);
 	// players sprites
